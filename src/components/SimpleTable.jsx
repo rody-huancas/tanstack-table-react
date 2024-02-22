@@ -2,35 +2,47 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  getPaginationRowModel
 } from "@tanstack/react-table";
 import data from "../MOCK_DATA.json";
+import dayjs from "dayjs";
 
-export const SimpleTable = () => {
+export const SimpleTable = () => {  
   const columns = [
     {
       header: "ID",
       accessorKey: "id",
-      footer: "Mi ID"
+      footer: "Mi ID",
     },
     {
-      header: "Nombres",
-      accessorKey: "name",
-      footer: "Mi Nombre"
+        header: "Nombres y Apellidos",
+        accessorFn: row => `${row.name} ${row.lastname}`
     },
+    // {
+    //   header: "Nombres",
+    //   accessorKey: "name",
+    //   footer: "Mi Nombre",
+    // },
+    // {
+    //   header: "Apellidos",
+    //   accessorKey: "lastname",
+    //   footer: "Mis Apellidos",
+    // },
     {
       header: "Email",
       accessorKey: "email",
-      footer: "Mi Email"
+      footer: "Mi Email",
     },
     {
       header: "Country",
       accessorKey: "country",
-      footer: "Mi País"
+      footer: "Mi País",
     },
     {
       header: "Fecha de nacimiento",
       accessorKey: "dayOfBirth",
-      footer: "Mi Fecha de nacimiento"
+      footer: "Mi Fecha de nacimiento",
+      cell: info => dayjs(info.getValue()).format('DD/MM/YYYY')
     },
   ];
 
@@ -38,6 +50,7 @@ export const SimpleTable = () => {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
   });
 
   return (
@@ -50,7 +63,10 @@ export const SimpleTable = () => {
                 <th key={header.id}>
                   {header.isPlaceholder ? null : (
                     <div>
-                      { flexRender( header.column.columnDef.header, header.getContext() )}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                     </div>
                   )}
                 </th>
@@ -70,23 +86,33 @@ export const SimpleTable = () => {
           ))}
         </tbody>
         <tfoot>
-            {
-                table.getFooterGroups().map( footerGroup => (
-                    <tr key={footerGroup.id}>
-                        {
-                            footerGroup.headers.map( footer => (
-                                <th key={footer.id}>
-                                    {
-                                        flexRender(footer.column.columnDef.footer, footer.getContext())
-                                    }
-                                </th>
-                            ) )
-                        }
-                    </tr>
-                ) )
-            }
+          {table.getFooterGroups().map((footerGroup) => (
+            <tr key={footerGroup.id}>
+              {footerGroup.headers.map((footer) => (
+                <th key={footer.id}>
+                  {flexRender(
+                    footer.column.columnDef.footer,
+                    footer.getContext()
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
         </tfoot>
       </table>
+
+      <button onClick={() => table.setPageIndex(0)}>
+        Primer Página
+      </button>
+      <button onClick={() => table.previousPage()}>
+        Página Anterior
+      </button>
+      <button onClick={() => table.nextPage()}>
+        Página Siguiente
+      </button>
+      <button onClick={() => table.setPageIndex(table.getPageCount() - 1)}>
+        Última Página
+      </button>
     </div>
   );
 };
