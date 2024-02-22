@@ -2,12 +2,15 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  getPaginationRowModel
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import data from "../MOCK_DATA.json";
 import dayjs from "dayjs";
+import { useState } from "react";
 
-export const SimpleTable = () => {  
+export const SimpleTable = () => {
   const columns = [
     {
       header: "ID",
@@ -15,8 +18,8 @@ export const SimpleTable = () => {
       footer: "Mi ID",
     },
     {
-        header: "Nombres y Apellidos",
-        accessorFn: row => `${row.name} ${row.lastname}`
+      header: "Nombres y Apellidos",
+      accessorFn: (row) => `${row.name} ${row.lastname}`,
     },
     // {
     //   header: "Nombres",
@@ -42,31 +45,55 @@ export const SimpleTable = () => {
       header: "Fecha de nacimiento",
       accessorKey: "dayOfBirth",
       footer: "Mi Fecha de nacimiento",
-      cell: info => dayjs(info.getValue()).format('DD/MM/YYYY')
+      cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY"),
     },
   ];
+
+  const [sorting, setSorting] = useState([]);
+  const [filtering, setFiltering] = useState("");
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      globalFilter: filtering,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setFiltering,
   });
 
   return (
     <div>
+      <input
+        type="text"
+        value={filtering}
+        onChange={(e) => setFiltering(e.target.value)}
+      />
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id}>
+                <th
+                  key={header.id}
+                  onClick={header.column.getToggleSortingHandler()}
+                >
                   {header.isPlaceholder ? null : (
                     <div>
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
+                      {
+                        { asc: "⬆", desc: "⬇" }[
+                          header.column.getIsSorted() ?? null
+                        ]
+                      }
                     </div>
                   )}
                 </th>
@@ -101,15 +128,9 @@ export const SimpleTable = () => {
         </tfoot>
       </table>
 
-      <button onClick={() => table.setPageIndex(0)}>
-        Primer Página
-      </button>
-      <button onClick={() => table.previousPage()}>
-        Página Anterior
-      </button>
-      <button onClick={() => table.nextPage()}>
-        Página Siguiente
-      </button>
+      <button onClick={() => table.setPageIndex(0)}>Primer Página</button>
+      <button onClick={() => table.previousPage()}>Página Anterior</button>
+      <button onClick={() => table.nextPage()}>Página Siguiente</button>
       <button onClick={() => table.setPageIndex(table.getPageCount() - 1)}>
         Última Página
       </button>
