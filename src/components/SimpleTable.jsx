@@ -6,48 +6,9 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import data from "../MOCK_DATA.json";
-import dayjs from "dayjs";
 import { useState } from "react";
 
-export const SimpleTable = () => {
-  const columns = [
-    {
-      header: "ID",
-      accessorKey: "id",
-      footer: "Mi ID",
-    },
-    {
-      header: "Nombres y Apellidos",
-      accessorFn: (row) => `${row.name} ${row.lastname}`,
-    },
-    // {
-    //   header: "Nombres",
-    //   accessorKey: "name",
-    //   footer: "Mi Nombre",
-    // },
-    // {
-    //   header: "Apellidos",
-    //   accessorKey: "lastname",
-    //   footer: "Mis Apellidos",
-    // },
-    {
-      header: "Email",
-      accessorKey: "email",
-      footer: "Mi Email",
-    },
-    {
-      header: "Country",
-      accessorKey: "country",
-      footer: "Mi País",
-    },
-    {
-      header: "Fecha de nacimiento",
-      accessorKey: "dayOfBirth",
-      footer: "Mi Fecha de nacimiento",
-      cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY"),
-    },
-  ];
+export const SimpleTable = ({data, columns}) => {
 
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
